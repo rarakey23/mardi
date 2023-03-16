@@ -1,0 +1,41 @@
+<div class="row g-1 row-cols-1 row-cols-xl-5 row-cols-lg-5 row-cols-md-3" id="append-file">
+  <% files.forEach(function (file) { %>
+  <div class="col">
+    <a href="javascript:void(0)" onclick='__detail___file(`<%- file.name %>`)'>
+      <div class="card border fades">
+        <div class="backdrop-file">
+          <span class="eye-file--">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+          </span>
+        </div>
+        <% if(file.type=='image'){ %>
+        <img src="<%- `/storage/${file.name}` %>" class="image-gallery" alt="...">
+        <% }else if(file.type=='video'){ %>
+        <div style="height: 10rem; background-color: #f8f8f8;" class="rounded d-flex align-items-center text-center justify-content-center">
+          <h4><%- file.ext %></h4>
+        </div>
+        <% }else if(file.type=='audio'){ %>
+        <div style="height: 10rem; background-color: #f8f8f8;" class="rounded d-flex align-items-center text-center justify-content-center">
+          <h4><%- file.ext %></h4>
+        </div>
+        <% }else{ %>
+        <div style="height: 10rem; background-color: #f8f8f8;" class="rounded d-flex align-items-center text-center justify-content-center">
+          <img src="/assets/images/doc.png" alt="">
+        </div>
+        <% } %>
+        <div class="card-body p-1">
+          <div class="d-flex">
+            <div class="me-auto one-line"><%- file.name %>
+            </div>
+            <span class="fix-one-line text-muted"><%- file.size %></span>
+          </div>
+          <small class="text-muted"><%- file.date %></small>
+        </div>
+      </div>
+    </a>
+  </div>
+  <% }); %>
+</div>

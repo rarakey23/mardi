@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html class="loading" lang="en" data-textdirection="ltr">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=0,minimal-ui">
+  <title>Log In - WA Blast</title>
+  <link rel="apple-touch-icon" href="/assets/images/favico.png">
+  <link rel="shortcut icon" type="image/x-icon" href="/assets/images/favico.png">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500;1,600" rel="stylesheet">
+
+  <link rel="stylesheet" type="text/css" href="/assets/vendors/css/vendors.min.css">
+  <link rel="stylesheet" type="text/css" href="/assets/vendors/css/extensions/sweetalert2.min.css">
+  <link rel="stylesheet" type="text/css" href="/assets/css/bootstrap.css">
+  <link rel="stylesheet" type="text/css" href="/assets/css/bootstrap-extended.css">
+  <link rel="stylesheet" type="text/css" href="/assets/css/colors.css">
+  <link rel="stylesheet" type="text/css" href="/assets/css/components.css">
+  <link rel="stylesheet" type="text/css" href="/assets/css/themes/dark-layout.css">
+  <link rel="stylesheet" type="text/css" href="/assets/css/themes/bordered-layout.css">
+  <link rel="stylesheet" type="text/css" href="/assets/css/themes/semi-dark-layout.css">
+
+  <!-- BEGIN: Page CSS-->
+  <link rel="stylesheet" type="text/css" href="/assets/css/core/menu/menu-types/vertical-menu.css">
+  <link rel="stylesheet" type="text/css" href="/assets/css/plugins/forms/form-validation.css">
+  <link rel="stylesheet" type="text/css" href="/assets/css/pages/authentication.css">
+  <link rel="stylesheet" type="text/css" href="/assets/css/plugins/extensions/ext-component-sweet-alerts.css">
+  <script src="/assets/vendors/js/extensions/sweetalert2.all.min.js"></script>
+</head>
+
+
+<body class="vertical-layout vertical-menu-modern blank-page navbar-floating footer-static  " data-open="click" data-menu="vertical-menu-modern" data-col="blank-page">
+  <!-- BEGIN: Content-->
+  <div class="app-content content ">
+    <div class="content-overlay"></div>
+    <div class="header-navbar-shadow"></div>
+    <div class="content-wrapper">
+      <div class="content-header row">
+      </div>
+      <div class="content-body">
+        <div class="auth-wrapper auth-basic px-2">
+          <div class="auth-inner my-2">
+            <!-- Login basic -->
+            <div class="card mb-0">
+              <div class="card-body">
+                <a href="/" class="brand-logo">
+                  <img src="/assets/images/logo.png" alt="Logo" height="50">
+                </a>
+
+                <h4 class="card-title mb-1">WA Blast</h4>
+                <p class="card-text mb-2">Login to use the app.</p>
+
+                <form class="auth-login-form mt-2" id="form">
+                  <div class="mb-1">
+                    <label for="login-email" class="form-label">Username</label>
+                    <input type="text" class="form-control" name="username" placeholder="username" aria-describedby="login-email" tabindex="1" autofocus />
+                  </div>
+
+                  <div class="mb-1">
+                    <div class="input-group input-group-merge form-password-toggle">
+                      <input type="password" class="form-control form-control-merge" name="password" tabindex="2" placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" aria-describedby="login-password" />
+                      <span class="input-group-text cursor-pointer"><i data-feather="eye"></i></span>
+                    </div>
+                  </div>
+                  <div class="mb-1">
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" name="remember" checked />
+                      <label class="form-check-label" for="remember-me"> Remember Me </label>
+                    </div>
+                  </div>
+                  <button id="btn-login" type="submit" class="btn btn-primary w-100" tabindex="4">Sign in</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="/assets/vendors/js/vendors.min.js"></script>
+  <script src="/assets/vendors/js/forms/validation/jquery.validate.min.js"></script>
+  <script src="/assets/js/core/app-menu.js"></script>
+  <script src="/assets/js/core/app.js"></script>
+  <script>
+    $(window).on('load', function() {
+      if (feather) {
+        feather.replace({
+          width: 14,
+          height: 14
+        });
+      }
+    })
+
+    $("#form").submit(function(e) {
+      e.preventDefault();
+      $("#btn-login").attr("disabled", true);
+      $("#btn-login").html("Loading...");
+      $.ajax({
+        url: "/login",
+        type: "POST",
+        data: $("#form").serialize(),
+        success: function(data) {
+          if (data.status) {
+            Swal.fire({
+              icon: 'success',
+              title: `Success!`,
+              text: `${data.message}`,
+              customClass: {
+                confirmButton: 'btn btn-success'
+              }
+            }).then(function() {
+              window.location.href = "/";
+            });
+          } else {
+            $("#btn-login").attr("disabled", false);
+            $("#btn-login").html("Sign in");
+            Swal.fire({
+              icon: 'error',
+              title: `Error!`,
+              text: `${data.message}`,
+              customClass: {
+                confirmButton: 'btn btn-success'
+              }
+            })
+          }
+        },
+        error: function(data) {
+          $("#btn-login").attr("disabled", false);
+          $("#btn-login").html("Sign in");
+          Swal.fire({
+            icon: 'error',
+            title: `Error!`,
+            text: `Something went wrong`,
+            customClass: {
+              confirmButton: 'btn btn-success'
+            }
+          })
+        }
+      });
+    });
+
+
+    $(function() {
+      'use strict';
+      var pageLoginForm = $('.auth-login-form');
+      if (pageLoginForm.length) {
+        pageLoginForm.validate({
+          rules: {
+            'username': {
+              required: true,
+            },
+            'password': {
+              required: true
+            }
+          }
+        });
+      }
+    });
+  </script>
+</body>
+
+</html>

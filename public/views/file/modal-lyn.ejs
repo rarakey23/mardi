@@ -1,0 +1,123 @@
+<%- include('../layouts/alert') %>
+
+<style>
+  .image-gallery {
+    width: 100%;
+    height: 10rem;
+    object-fit: cover;
+    border-start-start-radius: 5px;
+    border-start-end-radius: 5px;
+  }
+
+  .fades {
+    transition: 0.3s;
+  }
+
+  .fades:hover {
+    cursor: pointer;
+    transform: scale(1.01);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  }
+
+  .one-line {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .fix-one-line {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .backdrop-file {
+    position: absolute;
+    width: 100%;
+    height: 68%;
+  }
+
+  .backdrop-file:hover {
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    transition: 0.3s;
+    background-color: #2830469e;
+    cursor: pointer;
+  }
+
+  .backdrop-file:hover .eye-file-- {
+    display: block;
+  }
+
+  .eye-file-- {
+    position: absolute;
+    top: 48%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    display: none;
+  }
+
+  .dropzone .dz-message:before {
+    display: none !important;
+    background-image: none !important;
+  }
+</style>
+
+<link rel="stylesheet" type="text/css" href="/assets/vendors/css/file-uploaders/dropzone.min.css">
+<link rel="stylesheet" type="text/css" href="/assets/css/plugins/forms/form-file-uploader.css">
+
+<form action="#" class="dropzone dropzone-area" id="dpz-multiple-files">
+  <div class="dz-message">Drop files here or click to upload.</div>
+</form>
+
+<div class="card">
+  <div class="card-header">
+    <div class="me-auto">
+      File
+    </div>
+    <button class="btn btn-primary" onclick="dropzone_clear()">Clear Dropzone</button>
+  </div>
+  <div class="card-body" style="max-height: 60vh;min-height: 60vh; overflow-y: auto;" id="app___show_file">
+
+  </div>
+  <div class="card-footer text-end py-0">
+    <small>NJSFile v1.0 nodejs @ilsyaa</small>
+  </div>
+</div>
+
+
+<script src="/assets/vendors/js/file-uploaders/dropzone.min.js"></script>
+
+<script>
+  show()
+
+  Dropzone.autoDiscover = false;
+  var myDropzone = new Dropzone("#dpz-multiple-files", {
+    url: '/file/part/upload',
+    paramName: 'file',
+  });
+
+  var dropzone = document.querySelector('.dropzone');
+  dropzone.style.minHeight = '10rem';
+
+  myDropzone.on("complete", function(file) {
+    show()
+  });
+
+  function dropzone_clear() {
+    myDropzone.removeAllFiles(true);
+  }
+
+  function show() {
+    $.ajax({
+      url: `/file/part/show?type=modal`,
+      type: 'GET',
+      success: function(res) {
+        $("#app___show_file").html(res)
+      },
+      error: function(err) {
+        console.log(err)
+      }
+    });
+  }
+</script>

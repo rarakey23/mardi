@@ -1,0 +1,226 @@
+<div class="app-content content ">
+  <div class="content-overlay"></div>
+  <div class="header-navbar-shadow"></div>
+  <div class="content-wrapper container-xxl p-0">
+    <div class="content-header row">
+      <div class="content-header-left col-md-9 col-12 mb-2">
+        <div class="row breadcrumbs-top">
+          <div class="col-12">
+            <h5 class="content-header-title float-start mb-0">Device
+              <%- session_name %>
+            </h5>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="content-body">
+
+      <div class="row">
+        <div class="col-12 col-xl-9">
+          <div class="card">
+            <div class="card-header py-1">
+            </div>
+            <div class="card-body text-center">
+              <span id="qr-print-<%- session_name %>">
+                <div class="d-flex justify-content-center align-items-center" style="height: 30rem">
+                  <div class="spinner-grow" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                  </div>
+                </div>
+              </span>
+              <h5 class="mt-2">
+                <span id="connection-status-<%- session_name %>">
+                  <% if(device!=null){ %>
+                  Waiting for response...
+                  <% } else { %>
+                  <button onclick="start_device()" class="btn btn-primary"><i data-feather='play'></i> Start Device</button>
+                  <% } %>
+                </span>
+              </h5>
+              <h5 class="mt-2">
+                <span id="action-button-<%- session_name %>">
+                </span>
+              </h5>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card">
+            <div class="card-body">
+              <div class="info-container">
+                <ul class="list-unstyled">
+                  <li class="mb-75">
+                    <span class="fw-bolder me-25">Session Name :</span>
+                    <span><%- session_name %></span>
+                  </li>
+                  <li class="mb-75">
+                    <span class="fw-bolder me-25">Status:</span>
+                    <span id="status-<%- session_name %>">
+                      <span class="badge bg-light-secondary">-</span>
+                    </span>
+                  </li>
+                  <span id="detail-<%- session_name %>"></span>
+                </ul>
+                <div class="d-flex justify-content-center pt-2">
+                  <a href="javascript:;" class="btn btn-primary me-1" data-bs-target="#editUser" data-bs-toggle="modal">
+                    <i data-feather='settings'></i> Settings
+                  </a>
+                  <button onclick="_____delete_session()" class="btn btn-outline-danger suspend-user waves-effect"><i data-feather='power'></i> Delete</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+<% if(local=="true"){ %>
+<script>
+  var socket = io('<%- host %>:<%- port %>', {
+    transports: ['websocket',
+      'polling',
+      'flashsocket'
+    ]
+  });
+</script>
+<% }else{ %>
+<script>
+  var socket = io();
+</script>
+<% } %>
+
+<script>
+  function connection_status(session_name, msg = '') {
+    $("#connection-status-" + session_name).html(msg);
+  }
+
+  function action_button(session_name, msg = '') {
+    $("#action-button-" + session_name).html(msg);
+  }
+
+  function qr_print(session_name, msg = '') {
+    $("#qr-print-" + session_name).html(msg);
+  }
+
+  function detail(session_name, msg = '') {
+    $("#detail-" + session_name).html(msg);
+  }
+
+  function status(session_name, msg = 'STOPPED') {
+    if (msg == 'CONNECTED') {
+      $("#status-" + session_name).html('<span class="badge bg-light-success">CONNECTED</span>');
+    } else {
+      $("#status-" + session_name).html('<span class="badge bg-light-warning">STOPPED</span>');
+    }
+  }
+
+  function start_device() {
+    connection_status("<%- session_name %>", 'Waiting for response...');
+    action_button("<%- session_name %>");
+    socket.emit('start-device', {
+      sessionName: "<%- session_name %>",
+      user_id: "<%- user_id %>"
+    });
+  }
+
+  socket.on('connection-close', (data) => {
+    if (data.result) {
+      connection_status(`${data.session_name}`, data.result);
+    }
+    qr_print(`${data.session_name}`, '<div class="d-flex justify-content-center align-items-center" style="height: 30rem"><svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="1" y1="1" x2="23" y2="23"></line><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"></path><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"></path><path d="M10.71 5.05A16 16 0 0 1 22.58 9"></path><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12.01" y2="20"></line></svg></div>')
+    status(`${data.session_name}`, 'STOPPED');
+    detail(`${data.session_name}`, '');
+    if (data.button_reset == true) {
+      action_button(`${data.session_name}`, '<button onclick="start_device()" class="btn btn-primary">Restart</button>');
+    }
+  });
+
+  socket.on('session-status', (data) => {
+    if (data.status) {
+      connection_status(`${data.session_name}`, data.status);
+      if (data.status == 'CONNECTED') {
+        function capitalizeFirstLetter(string) {
+          return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+        status(`${data.session_name}`, 'CONNECTED');
+        detail(`${data.session_name}`, `<li class="mb-75"><span class="fw-bolder me-25">WA Name:</span><span>${data.client.name}</span></li><li class="mb-75"><span class="fw-bolder me-25">Number:</span><span>${data.client.number}</span></li><li class="mb-75"><span class="fw-bolder me-25">Platform:</span><span>${capitalizeFirstLetter(data.client.platform)}</span></li>`);
+        qr_print(`${data.session_name}`, '<div class="d-flex justify-content-center align-items-center" style="height: 30rem"><svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>');
+        action_button(`${data.session_name}`, ``);
+      } else {
+        status(`${data.session_name}`, 'STOPPED');
+        detail(`${data.session_name}`, '');
+        qr_print(`${data.session_name}`, '<div class="d-flex justify-content-center align-items-center" style="height: 30rem"><svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-wifi"><path d="M5 12.55a11 11 0 0 1 14.08 0"></path><path d="M1.42 9a16 16 0 0 1 21.16 0"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12.01" y2="20"></line></svg></div>');
+        action_button(`${data.session_name}`, `<button onclick="start_device()" class="btn btn-primary">Restart</button>`);
+      }
+    }
+  });
+
+  socket.on('update-qr', (data) => {
+    connection_status(`${data.session_name}`, 'QR Code Ready to be scanned.');
+    qr_print(`${data.session_name}`, `<img class="rounded shadow" style="height: 30rem" src="${data.buffer}" alt="" />`);
+  });
+
+  function _____delete_session() {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it!',
+      customClass: {
+        confirmButton: 'btn btn-primary',
+        cancelButton: 'btn btn-outline-danger ms-1'
+      },
+      buttonsStyling: false
+    }).then(function(result) {
+      if (result.value) {
+        socket.emit('delete-session', {
+          sessionName: "<%- session_name %>",
+        });
+      }
+    });
+  }
+
+  socket.on('alert', (data) => {
+    if (data.status) {
+      if (data.delete_session) {
+        status(`${data.session_name}`, 'STOPPED');
+        qr_print(`${data.session_name}`, '<div class="d-flex justify-content-center align-items-center" style="height: 30rem"><svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-wifi"><path d="M5 12.55a11 11 0 0 1 14.08 0"></path><path d="M1.42 9a16 16 0 0 1 21.16 0"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12.01" y2="20"></line></svg></div>');
+        action_button(`${data.session_name}`, ``);
+        connection_status(`${data.session_name}`, 'Device is Logged Out.');
+      }
+      Swal.fire({
+        icon: 'success',
+        title: `${data.title}`,
+        text: `${data.result}`,
+        customClass: {
+          confirmButton: 'btn btn-success'
+        }
+      }).then(function() {
+        if (data.delete_session) {
+          window.location.href = '/';
+        }
+      });
+    } else {
+      Swal.fire({
+        icon: 'error',
+        title: `${data.title}`,
+        text: `${data.result}`,
+        customClass: {
+          confirmButton: 'btn btn-success'
+        }
+      });
+    }
+  });
+</script>
+
+<% if(device!=null){ %>
+<script>
+  socket.emit('start-device', {
+    sessionName: "<%- session_name %>",
+    user_id: "<%- user_id %>"
+  });
+</script>
+<% } %>

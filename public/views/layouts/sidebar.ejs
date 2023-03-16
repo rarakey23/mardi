@@ -1,0 +1,94 @@
+<div class="main-menu menu-fixed menu-light menu-accordion menu-shadow" data-scroll-to-active="true">
+  <div class="navbar-header" style="    height: 102px;">
+    <ul class="nav navbar-nav flex-row">
+      <li class="nav-item me-auto">
+        <a class="navbar-brand" href="/">
+          <span class="brand-logo d-flex align-items-center">
+            <img src="/assets/images/logo.png" alt="Logo">
+          </span>
+        </a>
+      </li>
+      <li class="nav-item nav-toggle"><a class="nav-link modern-nav-toggle pe-0" data-bs-toggle="collapse"><i class="d-block d-xl-none text-primary toggle-icon font-medium-4" data-feather="x"></i><i class="d-none d-xl-block collapse-toggle-icon font-medium-4  text-primary" data-feather="disc" data-ticon="disc"></i></a></li>
+    </ul>
+  </div>
+  <div class="shadow-bottom"></div>
+  <div class="main-menu-content">
+    <ul class="navigation navigation-main" id="main-menu-navigation" data-menu="menu-navigation">
+      <li class="nav-item <%- (page_active=='home')? 'active' : '' %>">
+        <a class="d-flex align-items-center" href="/">
+          <i data-feather='sidebar'></i>
+          <span class="menu-title text-truncate" data-i18n="Dashboard">Dashboard</span>
+        </a>
+      </li>
+      <li class=" navigation-header"><span data-i18n="Apps &amp; Pages">Contact &amp; Message</span><i data-feather="more-horizontal"></i>
+      </li>
+      <li class="nav-item <%- (page_active=='autoreply')? 'active' : '' %>">
+        <a class="d-flex align-items-center" href="/autoreply">
+          <i data-feather='send'></i>
+          <span class="menu-title text-truncate" data-i18n="Auto Reply">Auto Reply</span>
+        </a>
+      </li>
+      <li class="nav-item <%- (page_active=='contacts')? 'active' : '' %>">
+        <a class="d-flex align-items-center" href="/contacts">
+          <i data-feather='book'></i>
+          <span class="menu-title text-truncate" data-i18n="Contacts">Contacts</span>
+        </a>
+      </li>
+      <li class="nav-item <%- (page_active=='template_message')? 'active' : '' %>">
+        <a class="d-flex align-items-center" href="/template-message">
+          <i data-feather='message-square'></i>
+          <span class="menu-title text-truncate" data-i18n="Template Message">Template Message</span>
+        </a>
+      </li>
+      <li class=" nav-item">
+        <a class="d-flex align-items-center" href="javascript:void(0)"><i data-feather='message-circle'></i><span class="menu-title text-truncate" data-i18n="WA Blast">WA Blast</span></a>
+        <ul class="menu-content">
+          <li class="<%- (page_active=='blast/numbers')? 'active' : '' %>">
+            <a class="d-flex align-items-center" href="/blast?by=numbers">
+              <i data-feather='chevron-right'></i><span class="menu-item text-truncate" data-i18n="By Number">By Numbers</span>
+            </a>
+          </li>
+          <li class="<%- (page_active=='blast/label')? 'active' : '' %>">
+            <a class="d-flex align-items-center" href="/blast?by=label">
+              <i data-feather='chevron-right'></i><span class="menu-item text-truncate" data-i18n="By Label">By Label</span>
+            </a>
+          </li>
+          <li class="<%- (page_active=='blast/all')? 'active' : '' %>">
+            <a class="d-flex align-items-center" href="/blast?by=all">
+              <i data-feather='chevron-right'></i><span class="menu-item text-truncate" data-i18n="All Numbers">All Numbers</span>
+            </a>
+          </li>
+        </ul>
+      </li>
+      <li class=" nav-item">
+        <a class="d-flex align-items-center" href="javascript:void(0)"><i data-feather='refresh-cw'></i><span class="menu-title text-truncate" data-i18n="Dashboards">History</span></a>
+        <ul class="menu-content">
+          <li class="<%- (page_active=='history/blast')? 'active' : '' %>">
+            <a class="d-flex align-items-center" href="/history/blast">
+              <i data-feather='chevron-right'></i><span class="menu-item text-truncate" data-i18n="Analytics">Blast</span>
+            </a>
+          </li>
+        </ul>
+      </li>
+      <li class=" navigation-header"><span data-i18n="Apps &amp; Pages">Other</span><i data-feather="more-horizontal"></i>
+      <li class="nav-item <%- (page_active=='file')? 'active' : '' %>">
+        <a class="d-flex align-items-center" href="/file">
+          <i data-feather='folder'></i>
+          <span class="menu-title text-truncate" data-i18n="File Manager">Manage File</span>
+        </a>
+      </li>
+      <% if (user.role=='admin' ) { %>
+      <li class=" nav-item">
+        <a class="d-flex align-items-center" href="javascript:void(0)"><i data-feather='shield'></i><span class="menu-title text-truncate" data-i18n="Dashboards">Admin Features</span></a>
+        <ul class="menu-content">
+          <li class="<%- (page_active=='admin/manage_users')? 'active' : '' %>">
+            <a class="d-flex align-items-center" href="/admin/users">
+              <i data-feather='chevron-right'></i><span class="menu-item text-truncate" data-i18n="Manage Users">Manage Users</span>
+            </a>
+          </li>
+        </ul>
+      </li>
+      <% } %>
+    </ul>
+  </div>
+</div>

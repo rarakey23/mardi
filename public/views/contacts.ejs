@@ -1,0 +1,297 @@
+<%- include('layouts/alert') %>
+
+  <div class="app-content content ">
+    <div class="content-overlay"></div>
+    <div class="header-navbar-shadow"></div>
+    <div class="content-wrapper container-xxl p-0">
+      <div class="content-header row">
+        <div class="content-header-left col-md-9 col-12 mb-2">
+          <div class="row breadcrumbs-top">
+            <div class="col-12">
+              <h5 class="content-header-title float-start mb-0">Contacts</h5>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="content-body">
+        <section id="basic-datatable">
+          <div class="row">
+            <div class="col-12">
+              <div class="card">
+                <table class="datatables-basic table">
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th></th>
+                      <th>Name</th>
+                      <th>Number</th>
+                      <th>Type</th>
+                      <th>Label</th>
+                      <!-- <th>Action</th> -->
+                    </tr>
+                  </thead>
+                </table>
+              </div>
+            </div>
+          </div>
+
+        </section>
+
+        <div class="modal fade" id="modalsaddnew" tabindex="-1" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalCenterTitle">Create New Device</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <form id="form-create-contacts">
+                <div class="modal-body">
+                  <div class="mb-1">
+                    <label class="form-label" for="basicInput">Name</label>
+                    <input type="text" name="name" class="form-control" autocomplete="off" required />
+                  </div>
+                  <div class="mb-1">
+                    <label class="form-label" for="basicInput">Number</label>
+                    <input type="text" name="number" class="form-control" autocomplete="off" required placeholder="62xxxxxx" />
+                  </div>
+                  <div class="mb-1">
+                    <label class="form-label" for="basicInput">Label</label>
+                    <input type="text" name="label" list="lab" class="form-control" autocomplete="off">
+                    <datalist id="lab">
+                      <% for (let i=0; i < labels.length; i++) { %>
+                        <option value="<%= labels[i].label %>">
+                          <%= labels[i].label %>
+                        </option>
+                        <% } %>
+                    </datalist>
+                  </div>
+                </div>
+                <div class="modal-footer" style="padding: 5px 1.4rem;">
+                  <button type="submit" class="btn btn-primary btn-sm" id="btn-create">Create</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal fade" id="modal-delete-label" tabindex="-1" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalCenterTitle">Delete By Label</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <form id="form-delete-label">
+                <div class="modal-body">
+                  <div class="mb-1">
+                    <label class="form-label" for="basicInput">Label</label>
+                    <select class="form-select" name="label">
+                      <% for (let i=0; i < labels.length; i++) { %>
+                        <option value="<%= labels[i].label %>">
+                          <%= labels[i].label %>
+                        </option>
+                        <% } %>
+                    </select>
+                  </div>
+                </div>
+                <div class="modal-footer" style="padding: 5px 1.4rem;">
+                  <button type="submit" class="btn btn-primary btn-sm" id="btn-delete">Delete</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="/assets/vendors/datatables_json.js"></script>
+  <script>
+    $("#form-create-contacts").submit(function (e) {
+      e.preventDefault();
+      $("#btn-create").attr("disabled", true);
+      $("#btn-create").html("Loading...");
+      $.ajax({
+        url: "/contacts/create",
+        type: "POST",
+        data: $(this).serialize(),
+        success: function (data) {
+          $("#btn-create").attr("disabled", false);
+          $("#btn-create").html("Create");
+          $("#modalsaddnew").modal("hide");
+          $("#form-create-contacts")[0].reset();
+          $(".datatables-basic").DataTable().ajax.reload();
+          Swal.fire({
+            icon: 'success',
+            title: 'created!',
+            text: 'Your data has been created.',
+            customClass: {
+              confirmButton: 'btn btn-success'
+            }
+          });
+        },
+        error: function (data) {
+          $("#btn-create").attr("disabled", false);
+          $("#btn-create").html("Create");
+          $("#modalsaddnew").modal("hide");
+          $("#form-create-contacts")[0].reset();
+          $(".datatables-basic").DataTable().ajax.reload();
+          Swal.fire({
+            icon: 'error',
+            title: 'Error!',
+            text: 'something went wrong.',
+            customClass: {
+              confirmButton: 'btn btn-success'
+            }
+          });
+        }
+      });
+    });
+
+    $("#form-delete-label").submit(function (e) {
+      e.preventDefault();
+      let label = $("select[name=label]").val();
+      if (!label) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Ops...',
+          text: 'Please select label!',
+          customClass: {
+            confirmButton: 'btn btn-success'
+          }
+        });
+        return false;
+      }
+      $("#btn-delete").attr("disabled", true);
+      $("#btn-delete").html("Loading...");
+      // ajax
+      $.ajax({
+        url: "/contacts/delete-label",
+        type: "POST",
+        data: {
+          label: label
+        },
+        success: function (data) {
+          $(".datatables-basic").DataTable().ajax.reload();
+          if (data.status == "success") {
+            $("#btn-delete").attr("disabled", false);
+            $("#btn-delete").html("Delete");
+            $("#modal-delete-label").modal("hide");
+            Swal.fire({
+              icon: 'success',
+              title: 'Deleted!',
+              text: 'contact has been deleted.',
+              customClass: {
+                confirmButton: 'btn btn-success'
+              }
+            });
+          }
+        }
+      });
+    });
+
+    datatables_lyn(
+      '.datatables-basic',
+      '/contacts/json',
+      '/contacts/delete',
+      [{
+        data: 'responsive_id'
+      },
+      {
+        data: 'id',
+      },
+      {
+        data: 'name',
+      },
+      {
+        data: 'number',
+      },
+      {
+        data: 'type',
+      },
+      {
+        data: 'label',
+      },
+      ],
+      [
+        {
+          text: feather.icons['plus'].toSvg({
+            class: 'me-50 font-small-4'
+          }) + 'New Device',
+          className: 'create-new btn btn-primary',
+          attr: {
+            'data-bs-toggle': 'modal',
+            'data-bs-target': '#modalsaddnew'
+          }
+        }, {
+          text: feather.icons['trash'].toSvg({
+            class: 'me-50 font-small-4'
+          }) + 'Delete [Checked]',
+          className: 'btn btn-outline-danger is-button-delete',
+        }, {
+          text: feather.icons['trash'].toSvg({
+            class: 'me-50 font-small-4'
+          }) + 'Delete [By Label]',
+          className: 'btn btn-outline-danger',
+          attr: {
+            'data-bs-toggle': 'modal',
+            'data-bs-target': '#modal-delete-label'
+          }
+        }, {
+          text: feather.icons['trash'].toSvg({
+            class: 'me-50 font-small-4'
+          }) + 'Delete [All]',
+          className: 'btn btn-outline-danger is-button-delete-all',
+        },
+      ],
+      'Contacts'
+    );
+
+    $(document).ready(function () {
+      $('.is-button-delete-all').on('click', function () {
+        Swal.fire({
+          title: 'Are you sure?',
+          text: "You won't be able to revert this!",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Yes, delete it!',
+          customClass: {
+            confirmButton: 'btn btn-primary',
+            cancelButton: 'btn btn-outline-danger ms-1'
+          },
+          buttonsStyling: false
+        }).then(function (result) {
+          if (result.value) {
+            $.ajax({
+              url: '/contacts/delete-all',
+              method: 'POST',
+              success: function (data) {
+                if (data['status'] == 'success') {
+                  $(".datatables-basic").DataTable().ajax.reload();
+                  Swal.fire({
+                    icon: 'success',
+                    title: 'Deleted!',
+                    text: 'All contacts have been deleted.',
+                    customClass: {
+                      confirmButton: 'btn btn-success'
+                    }
+                  });
+                } else {
+                  Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Something went wrong!',
+                    customClass: {
+                      confirmButton: 'btn btn-success'
+                    }
+                  });
+                }
+              }
+            });
+
+          }
+        });
+      })
+    })
+  </script>

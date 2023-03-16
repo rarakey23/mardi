@@ -1,0 +1,118 @@
+<%- include('../layouts/alert') %>
+<div class="app-content content ">
+  <div class="content-overlay"></div>
+  <div class="header-navbar-shadow"></div>
+  <div class="content-wrapper container-xxl p-0">
+    <div class="content-header row">
+      <div class="content-header-left col-md-9 col-12 mb-2">
+        <div class="row breadcrumbs-top">
+          <div class="col-12">
+            <h5 class="content-header-title float-start mb-0">History</h5>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="content-body">
+      <section id="basic-datatable">
+        <div class="row">
+          <div class="col-12">
+            <div class="card">
+              <table class="datatables-basic table">
+                <thead>
+                  <% if(!in_page_label){ %>
+                  <tr>
+                    <th></th>
+                    <th></th>
+                    <th>label</th>
+                    <th>total blast</th>
+                    <th>Action</th>
+                  </tr>
+                  <% }else{ %>
+                  <tr>
+                    <th></th>
+                    <th></th>
+                    <th>template</th>
+                    <th>receiver</th>
+                    <th>status</th>
+                    <th>is_save</th>
+                  </tr>
+                  <% } %>
+                </thead>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </section>
+    </div>
+  </div>
+</div>
+
+
+<script src="/assets/vendors/datatables_json.js"></script>
+<% if(!in_page_label){ %>
+<script>
+  datatables_lyn(
+    '.datatables-basic',
+    '/history/blast/json?by=label',
+    '/history/blast/delete?by=label',
+    [{
+        data: 'responsive_id'
+      },
+      {
+        data: 'id',
+      },
+      {
+        data: 'title',
+      },
+      {
+        data: 'total'
+      },
+      {
+        data: 'action',
+      },
+    ],
+    [{
+      text: feather.icons['trash'].toSvg({
+        class: 'me-50 font-small-4'
+      }) + 'Delete',
+      className: 'btn btn-outline-danger is-button-delete',
+    }, ],
+    'Blast History'
+  );
+</script>
+<% }else{ %>
+<script>
+  datatables_lyn(
+    '.datatables-basic',
+    '/history/blast/json?by=numbers',
+    '/history/blast/delete?by=numbers',
+    [{
+        data: 'responsive_id'
+      },
+      {
+        data: 'id',
+      },
+      {
+        data: 'template',
+      },
+      {
+        data: 'receiver',
+      },
+      {
+        data: 'status'
+      },
+      {
+        data: 'is_save',
+      },
+    ],
+    [{
+      text: feather.icons['trash'].toSvg({
+        class: 'me-50 font-small-4'
+      }) + 'Delete',
+      className: 'btn btn-outline-danger is-button-delete',
+    }, ],
+    'Blast' + ' ' + '<%= in_page_label %>'
+  );
+</script>
+<% } %>

@@ -1,0 +1,105 @@
+<%- include('layouts/alert') %>
+
+  <div class="app-content content ">
+    <div class="content-overlay"></div>
+    <div class="header-navbar-shadow"></div>
+    <div class="content-wrapper container-xxl p-0">
+      <div class="content-header row">
+        <div class="content-header-left col-md-9 col-12 mb-2">
+          <div class="row breadcrumbs-top">
+            <div class="col-12">
+              <h5 class="content-header-title float-start mb-0">Dashboard</h5>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="content-body">
+        <section id="basic-datatable">
+          <div class="row">
+            <div class="col-12">
+              <div class="card">
+                <table class="datatables-basic table">
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th></th>
+                      <th>Device</th>
+                      <th>Number</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                </table>
+              </div>
+            </div>
+          </div>
+
+        </section>
+
+        <div class="modal fade" id="modalsaddnew" tabindex="-1" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalCenterTitle">Create New Device</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <form action="/" method="POST" id="form-create-device">
+                <input type="hidden" name="type" value="create">
+                <div class="modal-body">
+                  <div class="mb-1">
+                    <label class="form-label" for="basicInput">Device Name</label>
+                    <input type="text" name="session_name" class="form-control" placeholder="ex device1" autocomplete="off" required />
+                  </div>
+                </div>
+                <div class="modal-footer" style="padding: 5px 1.4rem;">
+                  <button type="submit" class="btn btn-primary btn-sm" id="btn-create">Create</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="/assets/vendors/datatables_json.js"></script>
+  <script>
+    $("#form-create-device").submit(function () {
+      $("#btn-create").attr("disabled", true);
+      $("#btn-create").html("Loading...");
+    });
+
+    datatables_velixs({
+      table: '.datatables-basic',
+      json_url: '/json/device',
+      columns: [
+        {
+          data: 'responsive_id'
+        },
+        {
+          data: 'id',
+        },
+        {
+          data: 'session_name',
+        },
+        {
+          data: 'session_number',
+        },
+        {
+          data: 'action'
+        }
+      ],
+      btn: [
+        {
+          text: feather.icons['plus'].toSvg({
+            class: 'me-50 font-small-4'
+          }) + 'New Device',
+          className: 'create-new btn btn-primary',
+          attr: {
+            'data-bs-toggle': 'modal',
+            'data-bs-target': '#modalsaddnew'
+          }
+        }
+      ],
+    })
+  </script>

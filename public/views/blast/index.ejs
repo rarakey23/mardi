@@ -1,0 +1,379 @@
+<%- include('../layouts/alert') %>
+
+<div class="app-content content ">
+  <div class="content-overlay"></div>
+  <div class="header-navbar-shadow"></div>
+  <div class="content-wrapper container-xxl p-0">
+    <div class="content-header row">
+      <div class="content-header-left col-md-9 col-12 mb-2">
+        <div class="row breadcrumbs-top">
+          <div class="col-12">
+            <h5 class="content-header-title float-start mb-0">Blast</h5>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="content-body">
+
+      <form id="is-form-send" action="/blast/store" method="post">
+        <input type="hidden" name="by" value="<%- by %>">
+        <div class="card pt-1">
+          <div class="table-responsive">
+            <table class="table table-borderless mb-0">
+              <thead>
+                <tr>
+                  <th>
+                    <% if(by=='all'){ %>
+                    WA BLAST (All Contact Numbers)
+                    <% }else if(by=='numbers'){ %>
+                    WA BLAST (Numbers)
+                    <% }else if(by=='label'){ %>
+                    WA BLAST (Label)
+                    <% } %>
+                    <br> <span style="font-size: 10px;">Send multiple messages with one click.</span>
+                  </th>
+                  <th class="text-end"><button class="is-btn-send btn btn-primary round"><i data-feather='send'></i> Send</button></th>
+                </tr>
+              </thead>
+            </table>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-1">
+                  <label for="">Blast name</label>
+                  <input type="text" class="form-control" name="title" placeholder="Blast name" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group mb-1">
+                  <label for="basicSelect">Device (Session)</label>
+                  <select class="form-select" name="id_device">
+                    <% for(let device of devices){ %>
+                    <option value="<%- device.id %>"><%- device.session_name %> (<%- device.status %>)</option>
+                    <% } %>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group mb-1">
+                  <label for="basicSelect">Template Message</label>
+                  <select class="select2 form-select" name="id_message_template">
+                    <% for(let tmsg of templateMessages){ %>
+                    <option value="<%- tmsg.id %>"><%- tmsg.title %></option>
+                    <% } %>
+                  </select>
+                  <small>Create a message template <a href="/template-message">here.</a></small>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group mb-1">
+                  <label for="basicSelect">Save History</label>
+                  <select class="form-select" name="is_save">
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <% if(by=='all'){ %>
+            <small><span class="text-warning">NOTE :</span> Creating a blast here will send it to all numbers in the <a href="/contacts">contacts.</a></small>
+            <% } %>
+            <% if(by=='numbers'){ %>
+            <div class="mb-1">
+              <label for="">Receiver</label>
+              <select name="mn_numbers" multiple class="form-select select2" id="mn"></select>
+            </div>
+            <% } %>
+          </div>
+        </div>
+      </form>
+
+      <% if(by=='numbers'){ %>
+      <section id="basic-datatable">
+        <div class="row">
+          <div class="col-12">
+            <div class="card">
+              <table class="datatables-basic table">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th></th>
+                    <th>Name</th>
+                    <th>Number</th>
+                    <th>Type</th>
+                    <th>Label</th>
+                  </tr>
+                </thead>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+      <script src="/assets/vendors/datatables_json.js"></script>
+      <script>
+        function append_numbers(numbers) {
+          let mn = $("#mn");
+          mn.append(`<option  value="${numbers}">${numbers}</option>`);
+          let nm_numbers = [];
+          nm_numbers.push(numbers);
+          mn.val().forEach((e) => {
+            nm_numbers.push(e);
+          });
+          mn.val(nm_numbers);
+        }
+
+        $("#mn").on("select2:unselect", function(e) {
+          $(e.target).find(`option[value="${e.params.data.id}"]`).remove();
+          $(`.is-checkbox-delete[data-id="${e.params.data.id}"]`).prop('checked', false);
+        });
+
+        $(document).on('change', '.is-checkbox-delete', function() {
+          if ($(this).is(':checked')) {
+            append_numbers($(this).data('id'));
+          } else {
+            $(`#mn option[value="${$(this).data('id')}"]`).remove();
+          }
+        });
+
+        $(document).on('change', '#checkboxSelectAll', function() {
+          if ($(this).is(':checked')) {
+            $('.is-checkbox-delete').prop('checked', true);
+            $('.is-checkbox-delete').each(function() {
+              append_numbers($(this).data('id'));
+            });
+          } else {
+            $('.is-checkbox-delete').prop('checked', false);
+            $('.is-checkbox-delete').each(function() {
+              $(`#mn option[value="${$(this).data('id')}"]`).remove();
+            });
+          }
+        });
+
+        datatables_lyn(
+          '.datatables-basic',
+          '/contacts/json',
+          '/contacts/delete',
+          [{
+              data: 'responsive_id'
+            },
+            {
+              data: 'number',
+            },
+            {
+              data: 'name',
+            },
+            {
+              data: 'number',
+            },
+            {
+              data: 'type',
+            },
+            {
+              data: 'label',
+            },
+          ], [],
+          'Choose a number below.'
+        );
+        $(document).ready(function() {
+          $("#is-form-send").on('submit', function(e) {
+            e.preventDefault();
+            let form = $(this);
+            let url = form.attr('action');
+            let data = form.serialize();
+            $.ajax({
+              url: url,
+              type: 'POST',
+              data: data,
+              dataType: 'json',
+              success: function(response) {
+                if (response.status == 'success') {
+                  Swal.fire({
+                    title: 'Success!',
+                    text: response.message,
+                    icon: 'success',
+                    confirmButtonText: 'Ok'
+                  }).then((result) => {
+                    if (result.isConfirmed) {
+                      window.location.href = '/blast?by=numbers';
+                    }
+                  })
+                } else {
+                  Swal.fire({
+                    title: 'Error!',
+                    text: response.message,
+                    icon: 'error',
+                    confirmButtonText: 'Ok'
+                  })
+                }
+              },
+              error: function(xhr, status, error) {
+                Swal.fire({
+                  title: 'Error!',
+                  text: xhr.responseJSON.message,
+                  icon: 'error',
+                  confirmButtonText: 'Ok'
+                })
+              }
+            });
+          });
+        });
+      </script>
+      <% } %>
+
+
+      <% if(by=='label'){ %>
+
+      <section id="basic-datatable">
+        <div class="row">
+          <div class="col-12">
+            <div class="card">
+              <table class="datatables-basic table">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th></th>
+                    <th>Label</th>
+                    <th>Total</th>
+                  </tr>
+                </thead>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      <script src="/assets/vendors/datatables_json.js"></script>
+      <script>
+        $('#is-form-send').on('submit', function(e) {
+          e.preventDefault();
+          var id = [];
+          $('.is-checkbox-delete:checked').each(function(i) {
+            id[i] = $(this).data('id');
+          });
+          if (id.length === 0) {
+            Swal.fire({
+              icon: 'error',
+              title: 'Oops...',
+              text: 'Please select at least one label!',
+            });
+            return false;
+          } else {
+            $('.is-btn-send').html('<div class="spinner-border" role="status" style="height: 12px; width: 12px;"><span class="visually-hidden">Loading...</span></div> Loading...');
+            $('.is-btn-send').attr('disabled', true);
+            var form = $(this);
+            var url = form.attr('action');
+            for (var i = 0; i < id.length; i++) {
+              form.append('<input type="hidden" name="label[]" value="' + id[i] + '">');
+            }
+
+            $.ajax({
+              type: "POST",
+              url: url,
+              data: form.serialize(),
+              success: function(data) {
+                if (data.status == 'success') {
+                  Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: data.message,
+                  }).then((result) => {
+                    if (result.isConfirmed) {
+                      window.location.href = '/blast?by=label';
+                    }
+                  });
+                } else {
+                  Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: data.message,
+                  });
+                }
+                $('.is-btn-send').html('<i data-feather="send"></i> Send');
+                $('.is-btn-send').attr('disabled', false);
+              },
+              error: function(data) {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Oops...',
+                  text: 'Something went wrong!',
+                });
+                $('.is-btn-send').html('<i data-feather="send"></i> Send');
+                $('.is-btn-send').attr('disabled', false);
+              }
+            });
+
+          }
+        });
+
+        datatables_velixs({
+          table: '.datatables-basic',
+          json_url: '/blast/json?by=label',
+          columns: [{
+              data: 'responsive_id'
+            },
+            {
+              data: 'label',
+            },
+            {
+              data: 'label',
+            },
+            {
+              data: 'total',
+            }
+          ],
+          btn: [],
+          head_label: 'Select a label below.'
+        })
+      </script>
+      <% } %>
+      <% if(by=='all'){ %>
+      <script>
+        $('#is-form-send').on('submit', function(e) {
+          e.preventDefault();
+          $('.is-btn-send').html('<div class="spinner-border" role="status" style="height: 12px; width: 12px;"><span class="visually-hidden">Loading...</span></div> Loading...');
+          $('.is-btn-send').attr('disabled', true);
+          var form = $(this);
+          var url = form.attr('action');
+          $.ajax({
+            type: "POST",
+            url: url,
+            data: form.serialize(),
+            success: function(data) {
+              if (data.status == 'success') {
+                Swal.fire({
+                  icon: 'success',
+                  title: 'Success',
+                  text: data.message,
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                    window.location.href = '/blast?by=all';
+                  }
+                });
+              } else {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Oops...',
+                  text: data.message,
+                });
+              }
+              $('.is-btn-send').html('<i data-feather="send"></i> Send');
+              $('.is-btn-send').attr('disabled', false);
+            },
+            error: function(data) {
+              Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Something went wrong!',
+              });
+              $('.is-btn-send').html('<i data-feather="send"></i> Send');
+              $('.is-btn-send').attr('disabled', false);
+            }
+          });
+        });
+      </script>
+      <% } %>
+    </div>
+  </div>
+</div>

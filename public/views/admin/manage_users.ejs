@@ -1,0 +1,275 @@
+<%- include('../layouts/alert') %>
+
+  <div class="app-content content ">
+    <div class="content-overlay"></div>
+    <div class="header-navbar-shadow"></div>
+    <div class="content-wrapper container-xxl p-0">
+      <div class="content-header row">
+        <div class="content-header-left col-md-9 col-12 mb-2">
+          <div class="row breadcrumbs-top">
+            <div class="col-12">
+              <h5 class="content-header-title float-start mb-0">Manage Users</h5>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="content-body">
+        <section id="basic-datatable">
+          <div class="row">
+            <div class="col-12">
+              <div class="card">
+                <table class="datatables-basic table">
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th></th>
+                      <th>Username</th>
+                      <th>Role</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                </table>
+              </div>
+            </div>
+          </div>
+
+        </section>
+
+        <div class="modal fade" id="modalsaddnew" tabindex="-1" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalCenterTitle">Create New User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <form id="form-create">
+                <div class="modal-body">
+                  <div class="mb-1">
+                    <label class="form-label" for="basicInput">Role</label>
+                    <select class="form-select" name="role">
+                      <option value="user">User</option>
+                      <option value="admin">Admin</option>
+                    </select>
+                  </div>
+                  <div class="mb-1">
+                    <label class="form-label" for="basicInput">Name</label>
+                    <input type="text" name="name" class="form-control" autocomplete="off" required />
+                  </div>
+                  <div class="mb-1">
+                    <label class="form-label" for="basicInput">Username</label>
+                    <input type="text" name="username" class="form-control" autocomplete="off" required />
+                  </div>
+                  <div class="mb-1">
+                    <label class="form-label" for="basicInput">Password</label>
+                    <input type="text" name="password" class="form-control" autocomplete="off" required />
+                  </div>
+                </div>
+                <div class="modal-footer" style="padding: 5px 1.4rem;">
+                  <button type="submit" class="btn btn-primary btn-sm" id="btn-create">Create</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal fade" id="modaledit" tabindex="-1" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalCenterTitle">Edit User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <form id="form-update">
+                <div class="modal-body">
+                  <input type="hidden" name="edit_id">
+                  <div class="mb-1">
+                    <label class="form-label" for="basicInput">Role</label>
+                    <select class="form-select" name="edit_role">
+                      <option value="user">User</option>
+                      <option value="admin">Admin</option>
+                    </select>
+                  </div>
+                  <div class="mb-1">
+                    <label class="form-label" for="basicInput">Name</label>
+                    <input type="text" name="edit_name" class="form-control" autocomplete="off" required />
+                  </div>
+                  <div class="mb-1">
+                    <label class="form-label" for="basicInput">Username</label>
+                    <input type="text" name="edit_username" class="form-control" autocomplete="off" required />
+                  </div>
+                  <div class="mb-1">
+                    <label class="form-label" for="basicInput">Password</label>
+                    <input type="text" name="edit_password" class="form-control" autocomplete="off" />
+                    <small>Fill in if you want to change the password.</small>
+                  </div>
+                </div>
+                <div class="modal-footer" style="padding: 5px 1.4rem;">
+                  <button type="submit" class="btn btn-primary btn-sm" id="btn-create">Update</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/assets/vendors/datatables_json.js"></script>
+  <script>
+    function modaledit(id) {
+      $("#modaledit").modal("show");
+      let name = $("input[name='edit_name']");
+      let username = $("input[name='edit_username']");
+      let password = $("input[name='edit_password']");
+      let role = $("select[name='edit_role']");
+      let edit_id = $("input[name='edit_id']");
+      name.attr("placeholder", "Loading...");
+      username.attr("placeholder", "Loading...");
+      password.attr("placeholder", "Loading...");
+      name.val("");
+      username.val("");
+      role.val("");
+      $.ajax({
+        url: "/admin/users/edit/" + id,
+        type: "GET",
+        success: function (data) {
+          if (data.status) {
+            name.attr("placeholder", "");
+            username.attr("placeholder", "");
+            password.attr("placeholder", "");
+            edit_id.val(data.data.id)
+            name.val(data.data.name);
+            username.val(data.data.username);
+            role.val(data.data.role);
+          } else {
+            swalAlert('error', {
+              title: 'Error',
+              text: data.message
+            });
+          }
+        },
+        error: function (err) {
+          swalAlert('error', {
+            title: 'Error',
+            text: err.message
+          });
+        }
+      });
+    }
+
+    $("#form-update").submit(function (e) {
+      e.preventDefault();
+      btn_create();
+      $.ajax({
+        url: "/admin/users/update",
+        type: "POST",
+        data: $(this).serialize(),
+        success: function (data) {
+          btn_create(false);
+          if (data.status) {
+            $("#modaledit").modal("hide");
+            $(".datatables-basic").DataTable().ajax.reload();
+            $("#form-update")[0].reset();
+            swalAlert('success', {
+              title: 'Success',
+              text: data.message
+            });
+          } else {
+            swalAlert('error', {
+              title: 'Error',
+              text: data.message
+            });
+          }
+        },
+        error: function (err) {
+          btn_create(false);
+          swalAlert('error', {
+            title: 'Error',
+            text: err.message
+          });
+        }
+      });
+    })
+
+    $("#form-create").submit(function (e) {
+      e.preventDefault();
+      btn_create();
+      $.ajax({
+        url: "/admin/users/store",
+        type: "POST",
+        data: $(this).serialize(),
+        success: function (data) {
+          btn_create(false);
+          if (data.status) {
+            $("#modalsaddnew").modal("hide");
+            $(".datatables-basic").DataTable().ajax.reload();
+            $("#form-create")[0].reset();
+            swalAlert('success', {
+              title: 'Success',
+              text: data.message
+            });
+          } else {
+            swalAlert('error', {
+              title: 'Error',
+              text: data.message
+            });
+          }
+        },
+        error: function (data) {
+          btn_create(false);
+          swalAlert('error', {
+            title: 'Error',
+            text: data.message
+          });
+        },
+      });
+    });
+
+    function btn_create(loading = true) {
+      if (loading) {
+        $("#btn-create").attr("disabled", true);
+        $("#btn-create").html("Loading...");
+      } else {
+        $("#btn-create").attr("disabled", false);
+        $("#btn-create").html("Create");
+      }
+    }
+
+    function swalAlert(status, {
+      title,
+      text
+    }) {
+      Swal.fire({
+        icon: status,
+        title: title,
+        text: text,
+        customClass: {
+          confirmButton: 'btn btn-success'
+        }
+      });
+    }
+
+    datatables_lyn(
+      '.datatables-basic',
+      '/admin/users/json',
+      '/admin/users/delete',
+      [{
+        data: 'responsive_id'
+      },
+      {
+        data: 'id',
+      },
+      {
+        data: 'name',
+      },
+      {
+        data: 'role',
+      },
+      {
+        data: 'action'
+      }
+      ],
+      null,
+      'Manage Users'
+    );
+  </script>

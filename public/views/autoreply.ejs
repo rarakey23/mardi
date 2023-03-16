@@ -1,0 +1,156 @@
+<div class="app-content content ">
+    <div class="content-overlay"></div>
+    <div class="header-navbar-shadow"></div>
+    <div class="content-wrapper container-xxl p-0">
+        <div class="content-header row">
+            <div class="content-header-left col-md-9 col-12 mb-2">
+                <div class="row breadcrumbs-top">
+                    <div class="col-12">
+                        <h5 class="content-header-title float-start mb-0">Auto Reply</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="content-body">
+            <section id="basic-datatable">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <table class="datatables-basic table">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th></th>
+                                        <th>Keyword</th>
+                                        <th>Template Message</th>
+                                        <th>Device</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+
+            <div class="modal fade" id="modalsaddnew" tabindex="-1" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalCenterTitle">Create New Auto Reply</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form id="form-create">
+                            <div class="modal-body">
+                                <div class="mb-1">
+                                    <label class="form-label" for="basicInput">Device</label>
+                                    <select class="form-select" name="device" required>
+                                        <option value="">-</option>
+                                        <% for (var i = 0; i < device.length; i++) { %>
+                                        <option value="<%= device[i].id %>"><%= device[i].session_name %></option>
+                                        <% } %>
+                                    </select>
+                                </div>
+                                <div class="mb-1">
+                                    <label class="form-label" for="basicInput">Keyword</label>
+                                    <input type="text" name="keyword" class="form-control" autocomplete="off" required />
+                                </div>
+                                <div class="mb-1">
+                                    <label class="form-label" for="basicInput">Template Message</label>
+                                    <select class="select2 form-select" name="template_message" required>
+                                        <option value="">-</option>
+                                        <% for (var i = 0; i < template_message.length; i++) { %>
+                                        <option value="<%= template_message[i].id %>"><%= template_message[i].title %></option>
+                                        <% } %>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="modal-footer" style="padding: 5px 1.4rem;">
+                                <button type="submit" class="btn btn-primary btn-sm" id="btn-create">Create</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script src="/assets/vendors/datatables_json.js"></script>
+<script>
+    $("#form-create").submit(function(e) {
+        e.preventDefault();
+        $("#btn-create").attr("disabled", true);
+        $("#btn-create").html("Loading...");
+
+        $.ajax({
+            url: "/autoreply/store",
+            type: "POST",
+            data: $("#form-create").serialize(),
+            success: function(data) {
+                $("#btn-create").attr("disabled", false);
+                $("#btn-create").html("Create");
+                if (data.status) {
+                    $("#modalsaddnew").modal("hide");
+                    $("#form-create")[0].reset();
+                    $(".datatables-basic").DataTable().ajax.reload();
+                    $(".select2").val(null).trigger('change');
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: data.message,
+                        customClass: {
+                            confirmButton: 'btn btn-success'
+                        }
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: data.message,
+                        customClass: {
+                            confirmButton: 'btn btn-success'
+                        }
+                    });
+                }
+            },
+            error: function(data) {
+                $("#btn-create").attr("disabled", false);
+                $("#btn-create").html("Create");
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Something went wrong!',
+                    customClass: {
+                        confirmButton: 'btn btn-success'
+                    }
+                });
+            }
+        });
+    });
+
+    datatables_velixs({
+        table: '.datatables-basic',
+        json_url: '/autoreply/json',
+        delete_url: '/autoreply/delete',
+        columns: [{
+                data: 'responsive_id'
+            },
+            {
+                data: 'id',
+            },
+            {
+                data: 'keyword',
+            },
+            {
+                data: 'template_message',
+            },
+            {
+                data: 'device',
+            },
+        ],
+    })
+</script>
+
+<% - include('layouts/alert') %>

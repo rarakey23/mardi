@@ -1,0 +1,246 @@
+<%- include('../layouts/alert') %>
+<div class="app-content content ">
+  <div class="content-overlay"></div>
+  <div class="header-navbar-shadow"></div>
+  <div class="content-wrapper container-xxl p-0">
+    <div class="content-header row">
+      <div class="content-header-left col-md-9 col-12 mb-2">
+        <div class="row breadcrumbs-top">
+          <div class="col-12">
+            <h5 class="content-header-title float-start mb-0">Detail</h5>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="content-body">
+      <form action="/template-message/update" method="post">
+        <div class="card pt-1">
+          <div class="table-responsive">
+            <table class="table table-borderless mb-0">
+              <thead>
+                <tr>
+                  <th>title : <%- result.title %> <br>Type : <%- result.type %></th>
+                  <th class="text-end">
+                    <!-- <button type="submit" class="btn btn-primary me-1 btn-sm"><i data-feather='send'></i> SEND MESSAGE</button> -->
+                    <button type="submit" class="btn btn-primary btn-sm"><i data-feather='save'></i> UPDATE</button>
+                  </th>
+                </tr>
+              </thead>
+            </table>
+          </div>
+          <div class="card-body">
+            <input type="hidden" name="id" value="<%- result.id %>">
+            <input type="hidden" name="type_message" value="<%- result.type %>">
+            <div class="mb-1">
+              <label class="form-label" for="basicInput">Template name</label>
+              <input type="text" name="title" class="form-control" value="<%- result.title %>" autocomplete="off" required />
+            </div>
+            <% if(result.type=='product'){ %>
+            <div class="mb-1">
+              <label class="form-label" for="basicInput">Title Product</label>
+              <input type="text" name="product_title" class="form-control" value="<%- result.product_title %>" autocomplete="off" required />
+            </div>
+            <div class="row row-cols-2 row-cols-xl-2">
+              <div class="col">
+                <div class="mb-1">
+                  <label class="form-label" for="basicInput">Currency Code</label>
+                  <input type="text" name="currency" class="form-control" autocomplete="off" required placeholder="IDR , USD" value="<%- result.currency %>" />
+                </div>
+              </div>
+              <div class="col">
+                <div class="mb-1">
+                  <label class="form-label" for="basicInput">Price</label>
+                  <input type="text" name="price" class="form-control" autocomplete="off" required placeholder="100000" value="<%- result.price %>" />
+                </div>
+              </div>
+              <div class="col">
+                <div class="mb-1">
+                  <label class="form-label" for="basicInput">Sale Price</label>
+                  <input type="text" name="sale_price" class="form-control" autocomplete="off" required placeholder="100000" value="<%- result.after_discount %>" />
+                </div>
+              </div>
+              <div class="col">
+                <div class="mb-1">
+                  <label class="form-label" for="basicInput">Url Product</label>
+                  <input type="text" name="url" class="form-control" autocomplete="off" required value="<%- result.url %>" />
+                </div>
+              </div>
+            </div>
+            <% } %>
+            <% if(result.type=='media'){ %>
+            <div class="mb-1">
+              <label class="form-label" for="basicInput">Media</label>
+              <div class="input-group">
+                <input type="text" name="media" value="<%- result.media %>" class="form-control" required file-lyn="media-lyn" autocomplete="off" placeholder="media" />
+                <button type="button" class="btn btn-outline-primary ---file-lyn" target="media-lyn"><i data-feather='folder'></i> Select Media</button>
+              </div>
+            </div>
+            <% } %>
+            <% if(result.type=='product'){ %>
+            <div class="mb-1">
+              <label class="form-label" for="basicInput">Media</label>
+              <div class="input-group">
+                <input type="text" name="media" value="<%- result.media %>" class="form-control" required file-lyn="media-lyn" autocomplete="off" placeholder="Only Image (jpeg, jpg, png)" />
+                <button type="button" class="btn btn-outline-primary ---file-lyn" target="media-lyn"><i data-feather='folder'></i> Select Media</button>
+              </div>
+            </div>
+            <% } %>
+            <% if(result.type=='button'){ %>
+            <div class="mb-1">
+              <label class="form-label" for="basicInput">Media</label>
+              <div class="input-group">
+                <input type="text" name="media" value="<%- result.media %>" class="form-control" file-lyn="media-lyn" autocomplete="off" placeholder="Option" />
+                <button type="button" class="btn btn-outline-primary ---file-lyn" target="media-lyn"><i data-feather='folder'></i> Select Media</button>
+              </div>
+            </div>
+            <% } %>
+            <div class="mb-1">
+              <label class="form-label" for="basicInput">Message</label>
+              <textarea name="message" class="form-control" rows="10"><%- result.message %></textarea>
+            </div>
+            <% if(result.type=='product' || result.type=='button'){ %>
+            <div class="mb-1">
+              <label class="form-label" for="basicInput">Footer</label>
+              <input type="text" name="footer" class="form-control" value="<%- result.footer %>" autocomplete="off" required />
+            </div>
+            <% } %>
+            <% if(result.type=="button"){ %>
+            <div class="text-end mb-2">
+              <a href="#" data-bs-toggle="modal" data-bs-target="#modal-add-button" class="btn btn-outline-primary">Add Button</a>
+            </div>
+            <div class="table-responsive">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Display Button</th>
+                    <th>Response</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="list-button">
+                </tbody>
+              </table>
+            </div>
+            <% } %>
+            <div class="text-end mt-4">
+              <button class="btn btn-primary">Update</button>
+            </div>
+
+          </div>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
+
+
+<script src="/assets/vendors/file.ilysa.js"></script>
+
+<% if(result.type=="button"){ %>
+<div class="modal fade" id="modal-add-button" tabindex="-1" aria-labelledby="myModalLabel1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content shadow">
+      <div class="modal-header">
+        <h4 class="modal-title" id="label-modal-create">Add Button</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form id="form-add-button">
+        <div class="modal-body">
+          <div class="mb-1">
+            <label for="">type</label>
+            <select name="type-button" class="form-select">
+              <option value="quickReplyButton">quick Reply Button</option>
+              <option value="callButton">callButton</option>
+              <option value="urlButton">urlButton</option>
+            </select>
+          </div>
+          <div class="mb-1">
+            <label for="">Display</label>
+            <input type="text" class="form-control" name="display-button" placeholder="Ex : Button1" required autocomplete="off">
+          </div>
+          <div class="mb-1">
+            <label for="">Action</label>
+            <input type="text" class="form-control" name="action-button" placeholder="Ex : button1" required autocomplete="off">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary" id="btn-modal-create">Create</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script>
+  let position_edit = null;
+
+  $("#form-add-button").submit(function(e) {
+    e.preventDefault();
+    var data = $(this).serialize();
+    if (position_edit != null) {
+      $("#list-button tr").eq(position_edit).html(`
+        <td><input type="hidden" name="btntype[]" value="` + $("[name='type-button']").val() + `">` + $("[name='type-button']").val() + `</td>
+        <td><input type="hidden" name="btndisplay[]" value="` + $("[name='display-button']").val() + `">` + $("[name='display-button']").val() + `</td>
+        <td><input type="hidden" name="btnaction[]" value="` + $("[name='action-button']").val() + `">` + $("[name='action-button']").val() + `</td>
+        <td><a href="#" class="btn btn-outline-primary me-1 btn-sm btn-edit">Edit</a><a href="#" class="btn btn-outline-danger btn-sm btn-delete">Delete</a></td>
+    `);
+      position_edit = null;
+      $("#label-modal-create").html("Add Button");
+      $("#btn-modal-create").html("Create");
+    } else {
+      if ($("#list-button tr").length >= 5) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: 'Max 5 button',
+        })
+        return;
+      }
+      $("#list-button").append(`
+      <tr>
+        <td><input type="hidden" name="btntype[]" value="` + $("[name='type-button']").val() + `">` + $("[name='type-button']").val() + `</td>
+        <td><input type="hidden" name="btndisplay[]" value="` + $("[name='display-button']").val() + `">` + $("[name='display-button']").val() + `</td>
+        <td><input type="hidden" name="btnaction[]" value="` + $("[name='action-button']").val() + `">` + $("[name='action-button']").val() + `</td>
+        <td><a href="#" class="btn btn-outline-primary me-1 btn-sm btn-edit">Edit</a><a href="#" class="btn btn-outline-danger btn-sm btn-delete">Delete</a></td>
+      </tr>
+    `);
+    }
+    $("#modal-add-button").modal('hide');
+    $(this).trigger('reset');
+  })
+
+  $("#list-button").on('click', '.btn-delete', function(e) {
+    e.preventDefault();
+    $(this).parents('tr').remove();
+  })
+
+  $("#list-button").on('click', '.btn-edit', function(e) {
+    e.preventDefault();
+    var type = $(this).parents('tr').find("[name='btntype[]']").val();
+    var display = $(this).parents('tr').find("[name='btndisplay[]']").val();
+    var action = $(this).parents('tr').find("[name='btnaction[]']").val();
+    $("#modal-add-button").modal('show');
+    $("[name='type-button']").val(type);
+    $("[name='display-button']").val(display);
+    $("[name='action-button']").val(action);
+    position_edit = $(this).parents('tr').index();
+    // edit label
+    $("#label-modal-create").html("Edit Button");
+    $("#btn-modal-create").html("Update");
+  })
+
+  let btn_from_db = <%- JSON.stringify(button) %>;
+
+  for (let btn of btn_from_db) {
+    $("#list-button").append(`
+      <tr>
+        <td><input type="hidden" name="btntype[]" value="` + btn.type + `">` + btn.type + `</td>
+        <td><input type="hidden" name="btndisplay[]" value="` + btn.display_text + `">` + btn.display_text + `</td>
+        <td><input type="hidden" name="btnaction[]" value="` + btn.action + `">` + btn.action + `</td>
+        <td><a href="#" class="btn btn-outline-primary me-1 btn-sm btn-edit">Edit</a><a href="#" class="btn btn-outline-danger btn-sm btn-delete">Delete</a></td>
+      </tr>
+    `);
+  }
+</script>
+<% } %>

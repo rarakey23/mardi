@@ -1,0 +1,603 @@
+<%- include('../layouts/alert') %>
+<style>
+  .--tabs.active {
+    display: block;
+  }
+
+  .--tabs {
+    display: none;
+  }
+
+  .box {
+    width: 100%;
+    background: #005c4b;
+    color: #fff;
+    position: relative;
+    border-radius: 10px;
+    border-top-right-radius: 0px;
+  }
+
+  .box .body {
+    padding: 5px;
+    padding-top: 5px;
+    padding-bottom: 0px;
+    white-space: break-spaces;
+  }
+
+  .box .footer {
+    display: flex;
+    justify-content: end;
+    padding-right: 10px;
+    align-items: center;
+    padding-bottom: 5px;
+  }
+
+  .sb1:before {
+    content: "";
+    width: 0px;
+    height: 0px;
+    position: absolute;
+    border-left: 5px solid #005c4b;
+    border-right: 5px solid transparent;
+    border-top: 5px solid #005c4b;
+    border-bottom: 5px solid transparent;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    right: -8px;
+    top: 0px;
+  }
+
+  .box2 {
+    background: #025144;
+    color: #fff;
+    position: relative;
+    border-radius: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    display: flex;
+  }
+</style>
+
+<div class="app-content content ">
+  <div class="content-overlay"></div>
+  <div class="header-navbar-shadow"></div>
+  <div class="content-wrapper container-xxl p-0">
+    <div class="content-header row">
+      <div class="content-header-left col-md-9 col-12 mb-2">
+        <div class="row breadcrumbs-top">
+          <div class="col-12">
+            <h5 class="content-header-title float-start mb-0">Template Message</h5>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="content-body">
+      <section id="basic-datatable">
+        <div class="row">
+          <div class="col-12">
+            <div class="card">
+              <table class="datatables-basic table">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th></th>
+                    <th>Name Template</th>
+                    <th>Type</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <div class="modal fade" id="modalsaddnew" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <select name="type" class="form-select me-2">
+                <option value="ilsya">-- Select a message type --</option>
+                <option value="text">Send Text</option>
+                <option value="media">Send Media</option>
+                <option value="contact">Send Contacts</option>
+                <option value="product">Send Product</option>
+                <option value="button">Send Button</option>
+              </select>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="--tabs active" taget-id="ilsya">
+                <div class="text-center mt-5">
+                  <i data-feather='message-square' style="height: 49px; width: 49px;"></i>
+                  <h3 class="mt-2">Select a message type.</h3>
+                </div>
+              </div>
+              <div class="--tabs" taget-id="text">
+                <div class="row">
+                  <div class="col-12 col-xl-7 col-lg-7">
+                    <form method="POST" action="/template-message/store">
+                      <input type="hidden" name="type" value="text">
+                      <div class="mb-1">
+                        <label class="form-label" for="basicInput">Template name</label>
+                        <input type="text" name="title" class="form-control" autocomplete="off" required />
+                      </div>
+                      <div class="mb-1">
+                        <label class="form-label" for="basicInput">Message</label>
+                        <textarea name="message" id="message-text" class="form-control" rows="10"></textarea>
+                      </div>
+                      <button type="submit" class="btn btn-primary w-100 mb-1">Create</button>
+                    </form>
+                  </div>
+                  <div class="col-12 col-xl-5 col-lg-5">
+                    Preview
+
+                    <div class="card border">
+                      <div class="card-body">
+                        <div class="box sb1">
+                          <div class="body"><span class="live-preivew-text"></span></div>
+                          <div class="footer">
+                            <small>
+                              15:55 <i data-feather='check'></i>
+                            </small>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="--tabs" taget-id="media">
+                <div class="row">
+                  <div class="col-12 col-xl-7 col-lg-7">
+                    <form method="POST" action="/template-message/store">
+                      <input type="hidden" name="type" value="media">
+                      <div class="mb-1">
+                        <label class="form-label" for="basicInput">Template name</label>
+                        <input type="text" name="title" class="form-control" autocomplete="off" required />
+                      </div>
+                      <div class="mb-1">
+                        <label class="form-label" for="basicInput">Caption</label>
+                        <textarea name="message" id="message-media" onkeyup="live_preview_media()" class="form-control" rows="5"></textarea>
+                      </div>
+                      <div class="mb-1">
+                        <label class="form-label" for="basicInput">Media</label>
+                        <div class="input-group">
+                          <input type="text" name="media" id="media-media" onkeyup="live_preview_media()" class="form-control" file-lyn="media-lyn" autocomplete="off" required placeholder="https://fileku.io/myfile.png (jpg,mp3,pdf)" />
+                          <button type="button" class="btn btn-outline-primary ---file-lyn" target="media-lyn"><i data-feather='folder'></i> Select Media</button>
+                        </div>
+                      </div>
+                      <button type="submit" class="btn btn-primary w-100 mb-1">Create</button>
+                    </form>
+                  </div>
+                  <div class="col-12 col-xl-5 col-lg-5">
+                    Preview
+                    <div class="card border">
+                      <div class="card-body">
+                        <div class="box sb1">
+                          <div class="body"><span class="live-preivew-media"></span></div>
+                          <div class="footer">
+                            <small>
+                              15:55 <i data-feather='check'></i>
+                            </small>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="--tabs" taget-id="contact">
+                <div class="row">
+                  <div class="col-12 col-xl-7 col-lg-7">
+                    <form method="POST" action="/template-message/store">
+                      <input type="hidden" name="type" value="contact">
+                      <div class="mb-1">
+                        <label class="form-label" for="basicInput">Template name</label>
+                        <input type="text" name="title" class="form-control" autocomplete="off" required />
+                      </div>
+                      <div class="mb-1">
+                        <label class="form-label" for="basicInput">Contacts List</label>
+                        <textarea name="message" id="message-text" class="form-control" rows="10" placeholder="example : &#10;62854927847444 - Ilyasa,&#10;62884343434343 - Valen&#10;&#10;Separate contact number and name by using - (min)&#10;And separate the second contact with , (comma)"></textarea>
+                      </div>
+                      <button type="submit" class="btn btn-primary w-100 mb-1">Create</button>
+                    </form>
+                  </div>
+                  <div class="col-12 col-xl-5 col-lg-5">
+                    Demo
+                    <div class="card border">
+                      <div class="card-body">
+                        <img class="w-100 rounded" src="/assets/images/demo_contact.jpg" alt="">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="--tabs" taget-id="product">
+                <div class="row">
+                  <div class="col-12 col-xl-8 col-lg-8">
+                    <form method="POST" action="/template-message/store">
+                      <input type="hidden" name="type" value="product">
+                      <div class="mb-1">
+                        <label class="form-label" for="basicInput">Template name</label>
+                        <input type="text" name="title" class="form-control" autocomplete="off" required />
+                      </div>
+                      <div class="mb-1">
+                        <label class="form-label" for="basicInput">Title Product</label>
+                        <input type="text" id="title_product" name="product_title" onkeyup="live_preview_product()" class="form-control" autocomplete="off" required />
+                      </div>
+                      <div class="mb-1">
+                        <label class="form-label" for="basicInput">Media</label>
+                        <div class="input-group">
+                          <input type="text" name="media" id="media-product" onkeyup="live_preview_product()" class="form-control" file-lyn="media-lyn-product" autocomplete="off" required placeholder="only image (jpeg,jpg,png)" />
+                          <button type="button" class="btn btn-outline-primary ---file-lyn" target="media-lyn-product"><i data-feather='folder'></i> Select Media</button>
+                        </div>
+                      </div>
+                      <div class="row row-cols-2 row-cols-xl-2">
+                        <div class="col">
+                          <div class="mb-1">
+                            <label class="form-label" for="basicInput">Currency Code</label>
+                            <input type="text" name="currency" class="form-control" autocomplete="off" required placeholder="IDR , USD" />
+                          </div>
+                        </div>
+                        <div class="col">
+                          <div class="mb-1">
+                            <label class="form-label" for="basicInput">Price</label>
+                            <input type="text" name="price" id="price_product" class="form-control" onkeyup="live_preview_product()" autocomplete="off" required placeholder="100000" />
+                          </div>
+                        </div>
+                        <div class="col">
+                          <div class="mb-1">
+                            <label class="form-label" for="basicInput">Sale Price</label>
+                            <input type="text" name="sale_price" id="sale_product" class="form-control" onkeyup="live_preview_product()" autocomplete="off" required placeholder="100000" />
+                          </div>
+                        </div>
+                        <div class="col">
+                          <div class="mb-1">
+                            <label class="form-label" for="basicInput">Url Product</label>
+                            <input type="text" name="url" class="form-control" autocomplete="off" required />
+                          </div>
+                        </div>
+                      </div>
+                      <div class="mb-1">
+                        <label class="form-label" for="basicInput">Message</label>
+                        <textarea name="message" id="message-product" onkeyup="live_preview_product()" class="form-control" rows="5"></textarea>
+                      </div>
+                      <div class="mb-1">
+                        <label class="form-label" for="basicInput">Footer</label>
+                        <input type="text" name="footer" id="footer_product" class="form-control" onkeyup="live_preview_product()" autocomplete="off" required />
+                      </div>
+
+                      <button type="submit" class="btn btn-primary w-100 mb-1">Create</button>
+                    </form>
+                  </div>
+                  <div class="col-12 col-xl-4 col-lg-4">
+                    Preview
+                    <div class="card border">
+                      <div class="card-body">
+                        <div class="box sb1">
+                          <div class="body" style="white-space: unset;">
+
+                            <span class="live-preivew-product"></span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="--tabs" taget-id="button">
+                <form method="POST" action="/template-message/store" id="form-button">
+                  <div class="row">
+                    <div class="col-12 col-xl-7 col-lg-7">
+                      <input type="hidden" name="type" value="button">
+                      <div class="mb-1">
+                        <label class="form-label" for="basicInput">Template name</label>
+                        <input type="text" name="title" class="form-control" autocomplete="off" required />
+                      </div>
+                      <div class="mb-1">
+                        <label class="form-label" for="basicInput">Media</label>
+                        <div class="input-group">
+                          <input type="text" name="media" class="form-control" file-lyn="media-lyn-button" autocomplete="off" placeholder="option (can be empty). jpeg,jpg,png" />
+                          <button type="button" class="btn btn-outline-primary ---file-lyn" target="media-lyn-button"><i data-feather='folder'></i> Select Media</button>
+                        </div>
+                      </div>
+                      <div class="mb-1">
+                        <label class="form-label" for="basicInput">Message</label>
+                        <textarea name="message" class="form-control" rows="5"></textarea>
+                      </div>
+                      <div class="mb-1">
+                        <label class="form-label" for="basicInput">Footer</label>
+                        <input type="text" name="footer" class="form-control" autocomplete="off" required />
+                      </div>
+                    </div>
+                    <div class="col-12 col-xl-5 col-lg-5">
+                      Preview
+                      <div class="card border">
+                        <div class="card-body">
+                          <img src="/assets/images/demo_button.jpg" class="w-100 rounded">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="text-end mb-2">
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#modal-add-button" class="btn btn-primary">Create Button</a>
+                  </div>
+                  <div class="table-responsive">
+                    <table class="table">
+                      <thead>
+                        <tr>
+                          <th>Type</th>
+                          <th>Display Button</th>
+                          <th>Response</th>
+                          <th>Action</th>
+                        </tr>
+                      </thead>
+                      <tbody id="list-button">
+                      </tbody>
+                    </table>
+                  </div>
+                  <div class="text-center mt-2">
+                    <button type="submit" class="btn btn-primary w-50">Create Template</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal fade" id="modal-add-button" tabindex="-1" aria-labelledby="myModalLabel1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content shadow">
+            <div class="modal-header">
+              <h4 class="modal-title" id="myModalLabel1">Add Button</h4>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="form-add-button">
+              <div class="modal-body">
+                <div class="mb-1">
+                  <label for="">type</label>
+                  <select name="type-button" class="form-select">
+                    <option value="quickReplyButton">quick Reply Button</option>
+                    <option value="callButton">callButton</option>
+                    <option value="urlButton">urlButton</option>
+                  </select>
+                </div>
+                <div class="mb-1">
+                  <label for="">Display</label>
+                  <input type="text" class="form-control" name="display-button" placeholder="Ex : Button1" required autocomplete="off">
+                </div>
+                <div class="mb-1">
+                  <label for="">Action</label>
+                  <input type="text" class="form-control" name="action-button" placeholder="Ex : button1" required autocomplete="off">
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="submit" class="btn btn-primary">Create</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<script src="/assets/vendors/datatables_json.js"></script>
+<script src="/assets/vendors/file.ilysa.js"></script>
+<script>
+  $("select[name='type']").on("change", function() {
+    let target = $(this).val();
+    $(".--tabs").removeClass("active");
+    $(`.--tabs[taget-id='${target}']`).addClass("active");
+  })
+
+  let limit_button = 3;
+
+  $("#form-add-button").submit(function(e) {
+    e.preventDefault();
+    let count = $("#list-button tr").length;
+    if (count >= limit_button) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: `You can only add ${limit_button} button`,
+      })
+      return false;
+    }
+    let type = $(this).find("select[name='type-button']").val();
+    let display = $(this).find("input[name='display-button']").val();
+    let action = $(this).find("input[name='action-button']").val();
+    let html = `
+      <tr>
+        <input type="hidden" name="btntype[]" value="${type}">
+        <input type="hidden" name="btndisplay[]" value="${display}">
+        <input type="hidden" name="btnaction[]" value="${action}">
+        <td>${type}</td>
+        <td>${display}</td>
+        <td>${action}</td>
+        <td><a href="javascript:void(0)" class="btn btn-danger btn-sm __delete_list_button">Delete</a></td>
+      </tr>`;
+    $("#modal-add-button").modal("hide");
+    $("#list-button").append(html);
+    $(this).find("input").val("");
+  });
+
+  $(document).on("click", ".__delete_list_button", function() {
+    $(this).parent().parent().remove();
+  });
+
+  $("select[name='type-button']").on("change", function() {
+    let display = $("input[name='display-button']");
+    let action = $("input[name='action-button']");
+    if ($(this).val() == "quickReplyButton") {
+      display.attr("placeholder", "Ex : Button1");
+      action.attr("placeholder", "Ex : button1");
+    } else if ($(this).val() == "callButton") {
+      display.attr("placeholder", "Ex : Call Us");
+      action.attr("placeholder", "Ex : 08123456789");
+    } else if ($(this).val() == "urlButton") {
+      display.attr("placeholder", "Ex : Google");
+      action.attr("placeholder", "Ex : https://google.com");
+    }
+  });
+
+  $("#message-text").on("keyup", function() {
+    let text = $(this).val();
+    text = message_filter(text);
+    $(".live-preivew-text").html(`<div class="px-1 pt-1">${text}</div>`);
+  })
+
+  // form-button onkeyup
+  $("#form-button").on("keyup", function() {
+    let form = $(this);
+    let media = form.find("input[name='media']").val();
+    if (media != "") {
+      let ext = media.split(".").pop();
+      if (ext == "jpg" || ext == "png" || ext == "jpeg") {
+        form.find("input[name='media']").removeClass("is-invalid");
+      } else {
+        form.find("input[name='media']").addClass("is-invalid");
+      }
+    } else {
+      form.find("input[name='media']").removeClass("is-invalid");
+    }
+  })
+
+  function live_preview_media() {
+    let text = $("#message-media").val();
+    let media = $("#media-media").val();
+    let ext = media.split(".").pop();
+    if (ext == "jpg" || ext == "png" || ext == "jpeg") {
+      media = `<img src="${media}" class="img-fluid rounded w-100" style="object-fit: cover;max-height: 20rem;" /><div class="px-1">${text}</div>`;
+    } else if (ext == "mp3" || ext == "wav" || ext == "ogg" || ext == 'pdf' || ext == 'docx' || ext == 'doc' || ext == 'xlsx' || ext == 'xls' || ext == 'pptx' || ext == 'ppt') {
+      media = `<div class="box2"><svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg><div class="d-block"><div class="px-1">${text}</div><small class="text-muted px-1">${ext}</small></div></div>`;
+    } else {
+      media = ''
+    }
+    text = message_filter(text);
+    $(".live-preivew-media").html(media);
+  }
+
+  function live_preview_product() {
+    let title = $("#title_product").val();
+    let text = $("#message-product").val();
+    let media = $("#media-product").val();
+    let price = $("#price_product").val();
+    let sale = $("#sale_product").val();
+    let footer = $("#footer_product").val();
+    let ext = media.split(".").pop();
+
+    if (sale) {
+      price = `<span style="text-decoration: line-through;">${price.replace(/\,/g, "")}</span> ${sale.replace(/\,/g, "")}`
+    } else {
+      price = `<span>${price.replace(/\,/g, "")}</span>`
+    }
+    text = message_filter(text);
+    if (ext == "jpg" || ext == "png" || ext == "jpeg") {
+      media = `<div class="card mb-0" style="background-color: #025144;"><img src="${media}" class="img-fluid rounded w-100" style="object-fit: cover;max-height: 20rem;" /><div class="card-body py-1 px-1 d-flex align-items-end"><div class="me-auto"><div>${title}</div><small class="text-muted">${price}</small></div><small>15:55 <i data-feather='check'></i></small></div></div><div class="px-1 py-1" style="white-space: break-spaces;"><div>${text}</div><small class="text-muted">${footer}</small></div>`;
+    }
+    $(".live-preivew-product").html(media);
+  }
+
+  function live_preview_button() {
+
+  }
+
+  function message_filter(text) {
+    let regex = /~(.*?)~/g;
+    let match = text.match(regex);
+    if (match) {
+      match.forEach((item) => {
+        let key = item.replace(/~/g, "");
+        text = text.replace(item, `<span style="text-decoration: line-through;">${key}</span>`);
+      });
+    }
+    // _value_
+    regex = /_(.*?)_/g;
+    match = text.match(regex);
+    if (match) {
+      match.forEach((item) => {
+        let key = item.replace(/_/g, "");
+        text = text.replace(item, `<span style="font-style:italic;">${key}</span>`);
+      });
+    }
+    // *value* bold
+    regex = /\*(.*?)\*/g;
+    match = text.match(regex);
+    if (match) {
+      match.forEach((item) => {
+        let key = item.replace(/\*/g, "");
+        text = text.replace(item, `<span style="font-weight:bold;">${key}</span>`);
+      });
+    }
+
+    // link http:// or https://
+    regex = /(https?:\/\/[^\s]+)/g;
+    match = text.match(regex);
+    if (match) {
+      match.forEach((item) => {
+        text = text.replace(item, `<a href="${item}" target="_blank">${item}</a>`);
+      });
+    }
+    return text;
+  }
+
+
+  $("input[name='price']").on('keyup', function() {
+    let value = $(this).val();
+    value = value.replace(/,/g, "");
+    value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    $(this).val(value);
+  });
+
+  $("input[name='sale_price']").on('keyup', function() {
+    let value = $(this).val();
+    value = value.replace(/,/g, "");
+    value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    $(this).val(value);
+  });
+
+  datatables_velixs({
+    table: '.datatables-basic',
+    json_url: '/template-message/json',
+    delete_url: '/template-message/delete',
+    columns: [{
+        data: 'responsive_id'
+      },
+      {
+        data: 'id',
+      },
+      {
+        data: 'title',
+      },
+      {
+        data: 'type',
+      },
+      {
+        data: 'action',
+      },
+    ],
+    btn: [{
+      text: feather.icons['trash'].toSvg({
+        class: 'me-50 font-small-4'
+      }) + 'Delete',
+      className: 'btn btn-outline-danger is-button-delete',
+    }, {
+      text: feather.icons['plus'].toSvg({
+        class: 'me-50 font-small-4'
+      }) + 'Add New',
+      className: 'create-new btn btn-primary',
+      attr: {
+        'data-bs-toggle': 'modal',
+        'data-bs-target': '#modalsaddnew'
+      }
+    }]
+  });
+</script>
